@@ -1,8 +1,8 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const path = require('path');
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).send('Método no permitido');
     return;
@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
   try {
     const { nombre_cliente, num_acompanantes, numero_pedido } = req.body;
 
-    const plantillaPath = path.join(__dirname, '../plantilla.html');
+    const plantillaPath = path.join(process.cwd(), 'plantilla.html');
     let html = fs.readFileSync(plantillaPath, 'utf8');
 
     html = html
@@ -33,10 +33,10 @@ module.exports = async (req, res) => {
     await browser.close();
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename="vale-regalo.pdf"');
+    res.setHeader('Content-Disposition', 'attachment; filename=\"vale-regalo.pdf\"');
     res.status(200).send(pdfBuffer);
   } catch (error) {
     console.error('Error al generar el vale:', error);
     res.status(500).send('Error al generar el vale');
   }
-};
+}
