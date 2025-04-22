@@ -1,8 +1,8 @@
-import puppeteer from 'puppeteer';
-import fs from 'fs';
-import path from 'path';
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).send('Método no permitido');
     return;
@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   try {
     const { nombre_cliente, num_acompanantes, numero_pedido } = req.body;
 
-    const plantillaPath = path.join(process.cwd(), 'plantilla.html');
+    const plantillaPath = path.join(__dirname, '../plantilla.html');
     let html = fs.readFileSync(plantillaPath, 'utf8');
 
     html = html
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       .replace('{{numero_pedido}}', numero_pedido);
 
     const browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
@@ -39,4 +39,4 @@ export default async function handler(req, res) {
     console.error('Error al generar el vale:', error);
     res.status(500).send('Error al generar el vale');
   }
-}
+};
